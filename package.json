@@ -1,0 +1,43 @@
+{
+  "name": "node-shell-batcher",
+  "version": "1.0.0",
+  "description": "A CLI for running batches of shell commands on folders.",
+  "bin": "./bin/bin.js",
+  "scripts": {
+    "precommit": "lint-staged",
+    "prepush": "npm run lint && npm run test",
+    "lint": "eslint --ext .js .",
+    "test": "jest",
+    "release": "standard-version"
+  },
+  "lint-staged": {
+    "*.{js,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "keywords": [
+    "shell",
+    "bash",
+    "batch",
+    "execSync"
+  ],
+  "engines": {
+    "node": ">=8.11.4"
+  },
+  "author": "Joshua Pohl",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "eslint-config-defaults": "^9.0.0",
+    "eslint-config-prettier": "^6.3.0",
+    "husky": "^3.0.8",
+    "jest": "^24.9.0",
+    "lint-staged": "^9.4.1",
+    "prettier": "^1.18.2",
+    "standard-version": "^7.0.0"
+  },
+  "dependencies": {
+    "commander": "^3.0.2"
+  }
+}

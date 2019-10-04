@@ -1,0 +1,6 @@
+[
+  {
+    "path": "./sample",
+    "command": "cat"
+  }
+]
