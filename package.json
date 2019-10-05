@@ -1,6 +1,6 @@
 {
   "name": "node-shell-batcher",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A CLI for running batches of shell commands on folders.",
   "bin": "./bin/bin.js",
   "scripts": {
