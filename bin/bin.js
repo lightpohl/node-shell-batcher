@@ -56,25 +56,33 @@ folderList.forEach(folder => {
       return;
     }
 
-    // Use regular file path because we will run execSync from inside folder
-    let commandText =
-      typeof folder.command === 'function'
-        ? folder.command(filePath)
-        : `${folder.command} "${filePath}"`;
+    let commandArray = Array.isArray(folder.command)
+      ? folder.command
+      : [folder.command];
 
-    console.log(`INFO: ${commandText}`);
+    for (let command of commandArray) {
+      // Use regular file path because we will run execSync from inside folder
+      let commandText =
+        typeof command === 'function'
+          ? command(filePath)
+          : `${command} "${filePath}"`;
 
-    try {
-      execSync(commandText, {
-        cwd: relativeFolderPath,
-        stdio: 'inherit'
-      });
+      console.log(`INFO: ${commandText}`);
 
-      console.log('INFO: execSync completed successfully');
-    } catch (error) {
-      console.error(
-        'ERROR: execSync timed out or returned a non-zero exit code'
-      );
+      try {
+        execSync(commandText, {
+          cwd: relativeFolderPath,
+          stdio: 'inherit'
+        });
+
+        console.log('INFO: execSync completed successfully');
+      } catch (error) {
+        console.error(
+          'ERROR: execSync timed out or returned a non-zero exit code'
+        );
+        console.error('ERROR: any dependent commands will be skipped');
+        break;
+      }
     }
   });
 
