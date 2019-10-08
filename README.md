@@ -6,9 +6,9 @@
 
 `npx node-shell-batcher <path>`
 
-`npx node-shell-batch ./path/to/batch.js`
+`npx node-shell-batcher ./path/to/batch.js`
 
-`npx node-shell-batch ./path/to/batch.json`
+`npx node-shell-batcher ./path/to/batch.json`
 
 ### Batch File (required argument)
 
