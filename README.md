@@ -14,11 +14,11 @@
 
 `node-shell-batcher` requires the path to a "batch" file, which must contain an array of objects. These objects will need to at least contain a `path` to a folder, and a `command` to run on each file in that folder.
 
-| Option  | Type                                      | Required | Description                                                                                                                                                             |
-| ------- | ----------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| command | String\|Function\|Array<String\|Function> | true     | a string that represents a shell command, or a function that is passed the filename and should return a string. An array of dependent strings or functions is supported |
-| path    | String                                    | true     | path to folder where `command` should be run on each file                                                                                                               |
-| filter  | Function                                  | false    | will be passed into [`Array.prototype.filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter) for the folders files     |
+| Option  | Type                                      | Required | Description                                                                                                                                                                                 |
+| ------- | ----------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| command | String\|Function\|Array<String\|Function> | true     | A string that represents a shell command, or a function that is passed the current filename and must return a string. An array of dependent strings or functions is also supported.         |
+| path    | String                                    | true     | Path to folder where `command` will be run for each file.                                                                                                                                   |
+| filter  | Function                                  | false    | Passed into [`Array.prototype.filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter) to filter selected files in folder run for `command`. |
 
 #### Example Batch File
 
@@ -58,7 +58,7 @@ module.exports = batch;
 
 ### Additional Options
 
-| Option    | Short Flag | Required | Description               |
-| --------- | ---------- | -------- | ------------------------- |
-| --version | -v         | false    | output the version number |
-| --help    | -h         | false    | output usage information  |
+| Option    | Short Flag | Required | Description                |
+| --------- | ---------- | -------- | -------------------------- |
+| --version | -v         | false    | Output the version number. |
+| --help    | -h         | false    | Output usage information.  |
