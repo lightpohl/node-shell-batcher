@@ -37,4 +37,10 @@ describe('cli', () => {
     expect((outputString.match(/sample-1-result/g) || []).length).toBe(0);
     expect((outputString.match(/sample-2-result/g) || []).length).toBe(0);
   });
+
+  it('should continue successfully if a command is empty', () => {
+    let output = execSync('node bin/bin.js test/empty.js');
+    expect(output.toString().match(/sample-1-result/g).length).toBe(1);
+    expect(output.toString().match(/sample-2-result/g).length).toBe(1);
+  });
 });

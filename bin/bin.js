@@ -67,6 +67,10 @@ folderList.forEach(folder => {
           ? command(filePath)
           : `${command} "${filePath}"`;
 
+      if (command.length === 0) {
+        continue;
+      }
+
       console.log(`INFO: ${commandText}`);
 
       try {
