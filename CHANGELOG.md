@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/lightpohl/node-shell-batcher/compare/v1.1.0...v1.2.0) (2019-10-08)
+
+
+### Features
+
+* support command skipping by checking for empty commands ([505e30d](https://github.com/lightpohl/node-shell-batcher/commit/505e30d))
+
 ## [1.1.0](https://github.com/lightpohl/node-shell-batcher/compare/v1.0.2...v1.1.0) (2019-10-05)
 
 
