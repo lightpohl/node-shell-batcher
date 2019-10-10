@@ -43,4 +43,18 @@ describe('cli', () => {
     expect(output.toString().match(/sample-1-result/g).length).toBe(1);
     expect(output.toString().match(/sample-2-result/g).length).toBe(1);
   });
+
+  it('should skip invalid folder path', () => {
+    let output = execSync('node bin/bin.js test/wrong-folder.js');
+    expect(output.toString()).toContain('sample-1-result');
+    expect(output.toString()).toContain('sample-2-result');
+  });
+
+  it('should skip invalid command types', () => {
+    let outputString = execSync(
+      'node bin/bin.js test/invalid-types.js'
+    ).toString();
+    expect((outputString.match(/sample-1-result/g) || []).length).toBe(0);
+    expect((outputString.match(/sample-2-result/g) || []).length).toBe(0);
+  });
 });

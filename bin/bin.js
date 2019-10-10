@@ -4,6 +4,7 @@ let program = require('commander');
 let fs = require('fs');
 let path = require('path');
 let execSync = require('child_process').execSync;
+let logger = require('./logger');
 let version = require('../package.json').version;
 
 const PROCESS_CWD = process.cwd();
@@ -19,7 +20,7 @@ program
 program.parse(process.argv);
 
 if (!batchPath) {
-  console.error('ERROR: no JSON or JS file provided as an argument');
+  logger.error('ERROR: no JSON or JS file provided as an argument');
   process.exit(1);
 }
 
@@ -33,62 +34,81 @@ let folderList;
 try {
   folderList = require(relativeBatchPath);
 } catch (error) {
-  console.error(`ERROR: unable to load ${relativeBatchPath}`);
+  logger.error(`ERROR: unable to load ${relativeBatchPath}`);
   process.exit(1);
 }
 
 folderList.forEach(folder => {
   let relativeFolderPath = path.resolve(relativeBatchParentPath, folder.path);
-  let folderFiles = fs.readdirSync(relativeFolderPath);
 
-  console.log(`INFO: starting ${relativeFolderPath}`);
+  let folderFiles;
+  try {
+    folderFiles = fs
+      .readdirSync(relativeFolderPath, { withFileTypes: true })
+      .filter(file => !file.isDirectory())
+      .map(file => file.name);
+  } catch (error) {
+    logger.warn(`WARNING: unable to open ${folder.path}. Skipping.`);
+    return;
+  }
+
+  logger.log(`INFO: starting ${relativeFolderPath}`);
 
   let filteredFiles =
     typeof folder.filter === 'function'
       ? folderFiles.filter(folder.filter)
       : folderFiles;
 
+  if (filteredFiles.length === 0) {
+    logger.warn(`WARNING: no files found for ${folder}. Skipping.`);
+    return;
+  }
+
+  let commands = Array.isArray(folder.command)
+    ? folder.command
+    : [folder.command];
+
   filteredFiles.forEach(filePath => {
-    let relativeFilePath = path.resolve(relativeFolderPath, filePath);
-    let fileStats = fs.lstatSync(relativeFilePath);
-
-    if (!fileStats.isFile()) {
-      return;
-    }
-
-    let commandArray = Array.isArray(folder.command)
-      ? folder.command
-      : [folder.command];
-
-    for (let command of commandArray) {
-      // Use regular file path because we will run execSync from inside folder
-      let commandText =
-        typeof command === 'function'
-          ? command(filePath)
-          : `${command} "${filePath}"`;
-
-      if (command.length === 0) {
-        continue;
-      }
-
-      console.log(`INFO: ${commandText}`);
-
-      try {
-        execSync(commandText, {
-          cwd: relativeFolderPath,
-          stdio: 'inherit'
-        });
-
-        console.log('INFO: execSync completed successfully');
-      } catch (error) {
-        console.error(
-          'ERROR: execSync timed out or returned a non-zero exit code'
-        );
-        console.error('ERROR: any dependent commands will be skipped');
-        break;
-      }
-    }
+    runCommands({ commands, filePath, relativeFolderPath });
   });
 
-  console.log(`INFO: ${relativeFolderPath} complete`);
+  logger.log(`INFO: ${relativeFolderPath} complete`);
 });
+
+function runCommands({ commands, filePath, relativeFolderPath }) {
+  for (let command of commands) {
+    let commandText;
+    if (typeof command === 'function') {
+      commandText = command(filePath);
+    } else if (typeof command === 'string') {
+      commandText = `${command} "${filePath}"`;
+    } else {
+      logger.warn(
+        `WARNING: ${command} is an invalid type. Skipping any dependent commands.`
+      );
+      break;
+    }
+
+    if (command.length === 0) {
+      logger.warn('WARNING: command is empty. Skipping.');
+      continue;
+    }
+
+    logger.log(`INFO: ${commandText}`);
+
+    try {
+      execSync(commandText, {
+        cwd: relativeFolderPath,
+        stdio: 'inherit'
+      });
+
+      logger.log('INFO: execSync completed successfully');
+    } catch (error) {
+      logger.error(error);
+      logger.error(
+        'ERROR: execSync timed out or returned a non-zero exit code. Skipping any dependent commands.'
+      );
+      break;
+    }
+  }
+}
