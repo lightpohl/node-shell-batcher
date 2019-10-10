@@ -7,7 +7,6 @@ let execSync = require('child_process').execSync;
 let logger = require('./logger');
 let version = require('../package.json').version;
 
-const PROCESS_CWD = process.cwd();
 let batchPath;
 
 program
@@ -24,22 +23,11 @@ if (!batchPath) {
   process.exit(1);
 }
 
-let relativeBatchPath = path.resolve(PROCESS_CWD, batchPath);
-let relativeBatchParentPath = relativeBatchPath.substring(
-  0,
-  relativeBatchPath.lastIndexOf('/')
-);
-
-let folderList;
-try {
-  folderList = require(relativeBatchPath);
-} catch (error) {
-  logger.error(`ERROR: unable to load ${relativeBatchPath}`);
-  process.exit(1);
-}
+let folderList = getFolderList(batchPath);
+let relativeParentPath = getRelativeParentPath(batchPath);
 
 folderList.forEach(folder => {
-  let relativeFolderPath = path.resolve(relativeBatchParentPath, folder.path);
+  let relativeFolderPath = path.resolve(relativeParentPath, folder.path);
 
   let folderFiles;
   try {
@@ -74,6 +62,30 @@ folderList.forEach(folder => {
 
   logger.log(`INFO: ${relativeFolderPath} complete`);
 });
+
+function getFolderList(batchPath) {
+  let relativePath = path.resolve(process.cwd(), batchPath);
+
+  let folderList;
+  try {
+    folderList = require(relativePath);
+  } catch (error) {
+    logger.error(`ERROR: unable to load ${relativePath}`);
+    process.exit(1);
+  }
+
+  return folderList;
+}
+
+function getRelativeParentPath(batchPath) {
+  let relativePath = path.resolve(process.cwd(), batchPath);
+  let relativeParentPath = relativePath.substring(
+    0,
+    relativePath.lastIndexOf('/')
+  );
+
+  return relativeParentPath;
+}
 
 function runCommands({ commands, filePath, relativeFolderPath }) {
   for (let command of commands) {
